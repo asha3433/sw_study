@@ -1,12 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Nov  4 18:35:23 2024
-
-@author: UOU
-"""
-
 import cv2
 import numpy as np
+import os
 
 # Parameters for drawing
 drawing = False  # True if the mouse is pressed
@@ -39,8 +33,8 @@ def segment_image(image_path):
     # Read the image
     image = cv2.imread(image_path)
     if image is None:
-        print("Image not found!")
-        return
+        print(f"Image not found: {image_path}")
+        return False  # Return False if the image could not be read
 
     # Create a clone of the image for annotation display
     annotated_image = image.copy()
@@ -61,10 +55,11 @@ def segment_image(image_path):
         key = cv2.waitKey(1) & 0xFF
         if key == ord("s"):
             # Save annotations
-            with open("annotations.txt", "w") as f:
+            with open("annotations.txt", "a") as f:  # Append mode for multiple images
+                f.write(f"Annotations for {os.path.basename(image_path)}:\n")
                 for contour in annotations:
                     f.write(str(contour) + "\n")
-            print("Annotations saved to annotations.txt")
+            print(f"Annotations saved for {image_path}")
         elif key == ord("c"):
             # Clear annotations
             annotations.clear()
@@ -74,8 +69,23 @@ def segment_image(image_path):
             break
 
     cv2.destroyAllWindows()
+    return True  # Return True when finished
+
+# Function to process all images in a folder
+def process_images_in_folder(folder_path):
+    # Get all image files in the folder
+    image_files = [f for f in os.listdir(folder_path) if f.lower().endswith(('jpg', 'jpeg', 'png', 'bmp', 'tiff'))]
+    image_files.sort()  # Optional: sort images alphabetically or by name
+
+    for image_file in image_files:
+        image_path = os.path.join(folder_path, image_file)
+        print(f"Processing {image_file}...")
+        if not segment_image(image_path):
+            print(f"Skipping {image_file} due to an error.")
+        else:
+            print(f"Finished processing {image_file}.\n")
 
 # Example usage
 if __name__ == "__main__":
     PathNames = r"C:\Users\cic\Documents\sw_study\Image_dataset"
-    segment_image(PathNames + "//000000000139.jpg")
+    process_images_in_folder(PathNames)
