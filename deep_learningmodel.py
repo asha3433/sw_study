@@ -14,13 +14,13 @@ model = YOLO("yolo11n.pt")
 folder_path = r"C:\Users\cic\Documents\sw_study\Image_dataset"
 file_names = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
 
-results = model(folder_path+'\\'+file_names[0])
 
-# Load the image using cv2
-image = cv2.imread(folder_path+'\\'+file_names[0])
-
-# Draw bounding boxes and labels on the image
-for result in results:  # Iterate through results (one per detection)
+for i in range(0,499):
+    results = model(folder_path+'\\'+file_names[i])
+    # Load the image using cv2
+    image = cv2.imread(folder_path+'\\'+file_names[i])
+    # Draw bounding boxes and labels on the image
+    # for result in results:  # Iterate through results (one per detection)
     for box in result.boxes:
         x1, y1, x2, y2 = map(int, box.xyxy[0])  # Get bounding box coordinates
         confidence = box.conf[0]  # Confidence score
@@ -31,8 +31,7 @@ for result in results:  # Iterate through results (one per detection)
         cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
         # Draw the label
         cv2.putText(image, label_text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-# Display the image with detections
-cv2.imshow('YOLO Detections', image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+        # Display the image with detections
+        cv2.imshow('YOLO Detections', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
